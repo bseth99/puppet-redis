@@ -37,7 +37,20 @@
 class redis (
   $version = $redis::params::version,
   $redis_src_dir = $redis::params::redis_src_dir,
-  $redis_bin_dir = $redis::params::redis_bin_dir
+  $redis_bin_dir = $redis::params::redis_bin_dir,
+
+  $redis_port = $redis::params::redis_port,
+  $redis_bind_address = $redis::params::redis_bind_address,
+  $redis_max_memory = $redis::params::redis_max_memory,
+  $redis_max_clients = $redis::params::redis_max_clients,
+  $redis_timeout = $redis::params::redis_timeout,
+  $redis_loglevel = $redis::params::redis_loglevel,
+  $redis_databases = $redis::params::redis_databases,
+  $redis_slowlog_log_slower_than = $redis::params::redis_slowlog_log_slower_than,
+  $redis_slowlog_max_len = $redis::params::redis_slowlog_max_len,
+  $redis_password = $redis::params::redis_password,
+  $redis_notify_keyspace_events = $redis::params::redis_notify_keyspace_events
+
 ) inherits redis::params {
 
   include wget
@@ -47,7 +60,20 @@ class redis (
   $redis_pkg = "${redis_src_dir}/${redis_pkg_name}"
 
   # Install default instance
-  redis::instance { 'redis-default': }
+  redis::instance { 'redis-default':
+
+     redis_port => $redis_port,
+     redis_bind_address => $redis_bind_address,
+     redis_max_memory => $redis_max_memory,
+     redis_max_clients => $redis_max_clients,
+     redis_timeout => $redis_timeout,
+     redis_loglevel => $redis_loglevel,
+     redis_databases => $redis_databases,
+     redis_slowlog_log_slower_than => $redis_slowlog_log_slower_than,
+     redis_slowlog_max_len => $redis_slowlog_max_len,
+     redis_password => $redis_password,
+     redis_notify_keyspace_events => $redis_notify_keyspace_events
+  }
 
   File {
     owner => root,
@@ -75,7 +101,7 @@ class redis (
     }
   }
   exec { 'get-redis-pkg':
-    command => "/usr/bin/wget --output-document ${redis_pkg} http://redis.googlecode.com/files/${redis_pkg_name}",
+    command => "/usr/bin/wget --output-document ${redis_pkg} http://download.redis.io/releases/${redis_pkg_name}",
     unless  => "/usr/bin/test -f ${redis_pkg}",
     require => File[$redis_src_dir],
   }

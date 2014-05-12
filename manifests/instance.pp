@@ -44,6 +44,10 @@
 #   Password used by AUTH command. Will be setted is its not nil.
 #   Default: nil
 #
+# [*redis_notify_keyspace_events*]
+#   Turn on keyspace events and set to the specified value.
+#   Default: nil
+#
 # === Examples
 #
 # redis::instance { 'redis-6900':
@@ -69,7 +73,8 @@ define redis::instance (
   $redis_databases = $redis::params::redis_databases,
   $redis_slowlog_log_slower_than = $redis::params::redis_slowlog_log_slower_than,
   $redis_slowlog_max_len = $redis::params::redis_slowlog_max_len,
-  $redis_password = $redis::params::redis_password
+  $redis_password = $redis::params::redis_password,
+  $redis_notify_keyspace_events = $redis::params::redis_notify_keyspace_events
   ) {
 
   # Using Exec as a dependency here to avoid dependency cyclying when doing
@@ -91,8 +96,11 @@ define redis::instance (
     /^2\.6\.\d+$/: {
       $real_redis_max_clients = $redis_max_clients
     }
+    /^2\.8\.\d+$/: {
+      $real_redis_max_clients = $redis_max_clients
+    }
     default: {
-      fail("Invalid redis version, ${version}. It must match 2.4.\\d+ or 2.6.\\d+.")
+      fail("Invalid redis version, ${version}. It must match 2.4.\\d+, 2.6.\\d+, or 2.8.\\d+.")
     }
   }
 
